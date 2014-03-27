@@ -773,6 +773,8 @@ def test_fs_configuration(fs_config):
     return [(fs_config.WEBHDFS_URL,
             _('Failed to create temporary file "%s"') % tmpname)]
 
+  #Removed chown tmpname file to superuser becuase Non-super user cannot change owner
+
   finally:
     try:
       fs.remove(tmpname)
