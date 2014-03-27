@@ -752,7 +752,8 @@ def test_fs_configuration(fs_config):
     [ (config_variable, error_message) ]
   """
   fs = WebHdfs.from_config(fs_config)
-  fs.setuser(fs.superuser)
+  # dont need to be super user to access root
+  # fs.setuser(fs.superuser)
 
   # Access root
   try:
@@ -772,15 +773,8 @@ def test_fs_configuration(fs_config):
     return [(fs_config.WEBHDFS_URL,
             _('Failed to create temporary file "%s"') % tmpname)]
 
-  # Check superuser has super power
-  try:
-    try:
-      fs.chown(tmpname, fs.superuser)
-    except Exception, ex:
-      LOG.info("%s -- Validation error: %s" % (fs, ex))
-      return [(fs_config.WEBHDFS_URL,
-              'Failed to chown file. Please make sure that the filesystem root '
-              'is owned by the cluster superuser ("hdfs" in most cases).')]
+  #Removed chown tmpname file to superuser becuase Non-super user cannot change owner
+
   finally:
     try:
       fs.remove(tmpname)
