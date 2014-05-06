@@ -28,7 +28,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TType,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
-  TCloseOperationReq
+  TCloseOperationReq, TFetchResultsResp, TRowSet
 
 from beeswax import conf
 from beeswax import hive_site
@@ -528,8 +528,11 @@ class HiveServerClient:
 
 
   def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
-    fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
-    res = self.call(self._client.FetchResults, fetch_req)
+    if operation_handle.hasResultSet:
+      fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
+      res = self.call(self._client.FetchResults, fetch_req)
+    else:
+      res = TFetchResultsResp(results=TRowSet(startRowOffset=0, rows=[], columns=[]))
 
     if operation_handle.hasResultSet:
       meta_req = TGetResultSetMetadataReq(operationHandle=operation_handle)
